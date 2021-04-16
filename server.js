@@ -1,8 +1,9 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-
 const app = express();
+
+const connection = require("./config/db");
 
 const file_path = path.join(__dirname, "uploads");
 const storage = multer.diskStorage({
@@ -17,6 +18,8 @@ const storage = multer.diskStorage({
     cb(null, file_surfix);
   },
 });
+
+connection();
 
 const upload = multer({ storage: storage }).single("file");
 
