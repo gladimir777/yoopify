@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const bcrypt = require("bcrypt");
 const User = require("./models/User");
 const app = express();
 
@@ -32,12 +33,21 @@ app.post("/upload", upload, (req, res, next) => {
 });
 
 app.post("/auth/signup", async (req, res) => {
-  const { userName, email, password } = req.body;
-  const user = new User({ userName, email, password });
+  let { userName, email, password } = req.body;
+
   try {
-    const savedUser = await user.save();
-    return res.status(200).json(savedUser);
+    bcrypt.hash(password, 10, async function (err, hash) {
+      if (err) {
+        return res.status(500).json({ msg: "can not hash password" });
+      }
+
+      console.log(hashPassword);
+      const user = new User({ userName, email, password: hash });
+      const savedUser = await user.save();
+      return res.status(200).json(savedUser);
+    });
   } catch (error) {
+    console.log(error);
     return res.json({ error: "fail to save user" }).status(500);
   }
 });
